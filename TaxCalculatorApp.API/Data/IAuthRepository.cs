@@ -7,6 +7,7 @@ namespace TaxCalculatorApp.API.Data
     {
          Task<User> Register(User user, string password);
          Task<User> Login(string username, string password);
+         Task<User> GetUser(string username);
          Task<bool> UserExists(string username);
     }
 }

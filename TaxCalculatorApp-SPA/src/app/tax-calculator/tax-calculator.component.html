@@ -1,0 +1,52 @@
+<div class="container mt-5">
+  <div class="container">
+    <div class="text-center">
+      <form [formGroup]="taxCalculatorForm" (ngSubmit)="calculateTax()">
+        <h2 class="text-center text-primary">Tax Calculate</h2>
+        <hr />
+        <div class="inputGroup inputGroup1">
+          <label for="annualIncome">Annual Income</label>
+          <input id="annualIncome" name="annualIncome" type="text" class="form-control" placeholder="Annual Income"
+            [ngClass]="{
+                'is-invalid':
+                taxCalculatorForm.get('annualIncome').errors &&
+                taxCalculatorForm.get('annualIncome').touched
+              }"
+            formControlName="annualIncome">
+          <span class="md-line"></span>
+          <div class="invalid-feedback">Annual Income is required</div>
+        </div>
+        <div class="inputGroup inputGroup1">
+          <label for="postalCode">Postal Code</label>
+          <input id="postalCode" name="postalCode" type="text" class="form-control" placeholder="postalCode"
+            [ngClass]="{
+                'is-invalid':
+                taxCalculatorForm.get('postalCode').errors &&
+                taxCalculatorForm.get('postalCode').touched
+              }"
+            formControlName="postalCode">
+          <span class="md-line"></span>
+          <div class="invalid-feedback" *ngIf="
+              taxCalculatorForm.get('postalCode').hasError('required') &&
+              taxCalculatorForm.get('postalCode').touched
+            ">
+            postalCode is required
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="inputGroup inputGroup3">
+              <button id="calculate" type="submit">Calculate</button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-4">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

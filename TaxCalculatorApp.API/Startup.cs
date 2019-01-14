@@ -15,6 +15,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TaxCalculatorApp.API.Data;
+using AutoMapper;
+using Microsoft.AspNetCore.Diagnostics;
+using TaxCalculatorApp.API.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace TaxCalculatorApp.API
 {
@@ -33,7 +37,10 @@ namespace TaxCalculatorApp.API
             services.AddDbContext<DataContext>(d => d.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddCors();
+            Mapper.Reset();
+            services.AddAutoMapper();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<ITaxCalculatorRepository, TaxCalculatorRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options => {
                         options.TokenValidationParameters = new TokenValidationParameters
@@ -57,10 +64,17 @@ namespace TaxCalculatorApp.API
             }
             else
             {
-                // app.UseHsts();
+                 app.UseExceptionHandler(builder => builder.Run(async context => {
+                    context.Response.StatusCode =(int) System.Net.HttpStatusCode.InternalServerError;
+                    var error = context.Features.Get<IExceptionHandlerFeature>();
+                    if(error != null) {
+                        context.Response.AddApplicationError(error.Error.Message);
+                        await context.Response.WriteAsync(error.Error.Message);
+                    }
+                }));
             }
 
-            // app.UseHttpsRedirection();
+            // app.UseCors(x => x.WithOrigins("http://localhost:4200/").AllowAnyMethod().AllowAnyHeader());
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseAuthentication();
             app.UseMvc();
